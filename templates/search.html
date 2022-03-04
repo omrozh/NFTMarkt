@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Koleksiyonları Keşfedin | NFTMarkt</title>
+    <script
+      src="https://kit.fontawesome.com/4246ac988c.js"
+      crossorigin="anonymous"
+    ></script>
+    <link rel="stylesheet" href="/file/styles.css">
+  </head>
+  <body>
+    <div class="navbar">
+      <img onclick="document.location = '/home'" class="logo" src="/file/Markt.png" alt="" />
+        <form id="main-form" method="post" enctype="multipart/form-data">
+            <input
+            type="text"
+            placeholder="Ara"
+            class="search-bar"
+            id="search-bar"
+            name="search_term"
+            style="left: 150px"
+            onchange="document.getElementById('main-form').submit()"
+          />
+        </form>
+
+      </div>
+      <br>
+      <br>
+      <br>
+      <center><h1>Koleksiyonları keşfedin</h1></center>
+      <div class="showroom">
+        {% for i in collections %}
+          <div class="showcase-card">
+          <img
+            src="{{ i.banner_image }}"
+            alt=""
+            class="card-image"
+          />
+          <h1>{{ i.title }}</h1>
+          <p>
+            {{ i.description }}
+          </p>
+          <h3>Minimum Fiyat</h3>
+          <p>{{ i.min_price }}₺</p>
+          <h3>Maximum Fiyat</h3>
+          <p>{{ i.max_price }}₺</p>
+          <button class="blue-btn" onclick="window.location = '/view-collection/collection={{ i.id }}'">Koleksiyona Git</button>
+        </div>
+        {% endfor %}
+        <br style="clear: both">
+        <br>
+      </div>
+    <script>
+        window.onload = function(){
+          document.getElementById('search-bar').focus();
+        }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>NFT Markt'a Hoşgeldiniz</title>
+    <link rel="stylesheet" href="/file/signing.css">
+</head>
+<body>
+    <h2>NFT Markt'a Hoşgeldiniz</h2>
+    <div class="container" id="container">
+        <div class="form-container sign-up-container">
+            <form method="post" enctype="multipart/form-data">
+                <h1>Hesap Oluştur</h1>
+
+                    <input type="text" name="form-identifier" value="signup" style="display: none">
+                    <input type="text" name="isim" placeholder="İsim Soyisim" />
+                    <input type="email" name="email"  placeholder="Email" />
+                    <input type="password" name="password" placeholder="Şifre" />
+                    <button>Hesap Oluştur</button>
+                </form>
+
+        </div>
+        <div class="form-container sign-in-container">
+            <form method="post" enctype="multipart/form-data">
+                <h1>Giriş Yap</h1>
+
+                    <input type="text" name="form-identifier" value="signin" style="display: none">
+                    <input type="email" name="email"  placeholder="Email" />
+                    <input type="password" name="password" placeholder="Şifre" />
+                    <button type="submit">Giriş Yap</button>
+
+            </form>
+        </div>
+        <div class="overlay-container">
+            <div class="overlay">
+                <div class="overlay-panel overlay-left">
+                    <h1>Hoşgeldiniz!</h1>
+                    <p>Lütfen devam etmek için bilgilerinizirip giriş yapın.</p>
+                    <button class="ghost" id="signIn">Giriş Yap</button>
+                </div>
+                <div class="overlay-panel overlay-right">
+                    <h1>Merhaba!</h1>
+                    <p>Devam etmek için lütfen bir hesap oluşturun.</p>
+                    <button type="submit" class="ghost" id="signUp">Hesap Oluştur</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/file/signing.js"></script>
+</body>
+</html>

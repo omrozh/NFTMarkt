@@ -1,0 +1,32 @@
+{
+  "name": "TEST NFT",
+  "symbol": "TEST",
+  "description": "SOL TEST NFT",
+  "seller_fee_basis_points": 0,
+  "image": "https://nftmarkt.com.tr/file/1235741banner-image",
+  "attributes": [
+    {
+      "trait_type": "cypher",
+      "value": "TEST"
+    }
+  ],
+  "collection": {
+    "name": "Test Collection",
+    "family": "TEST"
+  },
+  "properties": {
+    "files": [
+      {
+        "uri": "https://nftmarkt.com.tr/file/1235741banner-image",
+        "type": "image/jpg"
+      }
+    ],
+    "category": "image",
+    "creators": [
+      {
+        "address": "AvFLeGBFDthzdoct5mHpbUE8ZJdYD4oZXpksoRiws8AG",
+        "share": 100
+      }
+    ]
+  }
+}

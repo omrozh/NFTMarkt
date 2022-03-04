@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Koleksiyonları Keşfedin | NFTMarkt</title>
+    <script
+      src="https://kit.fontawesome.com/4246ac988c.js"
+      crossorigin="anonymous"
+    ></script>
+    <link rel="stylesheet" href="/file/styles.css">
+  </head>
+  <body>
+    <div class="navbar">
+      <img onclick="document.location = '/home'" class="logo" src="/file/Markt.png" alt="" />
+      <input
+        type="text"
+        placeholder="Koleksiyonları arayın"
+        class="search-bar"
+        id="search-bar"
+        onclick="document.location = '/search'"
+      />
+      <i
+        class="fas fa-search"
+        style="
+          color: gray;
+          position: absolute;
+          right: 40%;
+          font-size: 1.5rem;
+          top: 22px;
+          display: none;
+        "
+        id="search-icon"
+        onclick="document.location = '/search'"
+      ></i>
+      
+      <i
+        class="far fa-user"
+        style="
+          color: gray;
+          position: absolute;
+          right: 5%;
+          font-size: 1.5rem;
+          top: 22px;
+        "
+        onclick="window.open('/profile')"
+      ></i>
+      </div>
+      <br>
+      <br>
+      <br>
+      <center><h1>Koleksiyonları keşfedin</h1></center>
+      <div class="showroom">
+        {% for i in collections %}
+          <div class="showcase-card">
+          <img
+            src="{{ i.banner_image }}"
+            alt=""
+            class="card-image"
+          />
+          <h1>{{ i.title }}</h1>
+          <p>
+            {{ i.description }}
+          </p>
+          <h3>Minimum Fiyat</h3>
+          <p>{{ i.min_price }}₺</p>
+          <h3>Maximum Fiyat</h3>
+          <p>{{ i.max_price }}₺</p>
+          <button class="blue-btn" onclick="window.location = '/view-collection/collection={{ i.id }}'">Koleksiyona Git</button>
+        </div>
+        {% endfor %}
+        <br style="clear: both">
+        <br>
+      </div>
+    <script>
+      if(window.innerHeight > window.innerWidth){
+        document.getElementById("search-bar").style.display = "none"
+        document.getElementById("search-icon").style.display = "block"
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Kendi varlığınızı oluşturun | NFTMarkt</title>
+    <link rel="stylesheet" href="/file/styles.css" />
+    <script
+      src="https://kit.fontawesome.com/4246ac988c.js"
+      crossorigin="anonymous"
+    ></script>
+    <style>
+      .file-upload {
+        border: 2px dashed rgb(196, 196, 196);
+        display: inline-block;
+        padding: 6px 12px;
+        cursor: pointer;
+        width: 500px;
+        height: 400px;
+        color: gray;
+        font-weight: 700;
+        font-size: 1.5rem;
+        position: relative;
+        border-radius: 15px;
+        background-repeat: no-repeat;
+        background-position: center center;
+      }
+      .form-container {
+        padding: 2%;
+        margin-left: 3%;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="navbar">
+      <img onclick="document.location = '/home'" class="logo" src="/file/Markt.png" alt="" />
+      <input
+        type="text"
+        placeholder="Koleksiyonları arayın"
+        class="search-bar"
+        id="search-bar"
+        onclick="document.location = '/search'"
+      />
+      <i
+        class="fas fa-search"
+        style="
+          color: gray;
+          position: absolute;
+          right: 40%;
+          font-size: 1.5rem;
+          top: 22px;
+          display: none;
+        "
+        id="search-icon"
+        onclick="document.location = '/search'"
+      ></i>
+
+      <i
+        class="far fa-user"
+        style="
+          color: gray;
+          position: absolute;
+          right: 5%;
+          font-size: 1.5rem;
+          top: 22px;
+        "
+        onclick="window.open('/profile')"
+      ></i>
+    </div>
+    <div class="form-container">
+      <h1 style="font-size: 3rem">Yeni NFT Oluştur</h1>
+      <p>Bir NFT varlığı oluşturun</p>
+      <form method="post" enctype="multipart/form-data">
+        <label class="file-upload">
+            <input id="image-input" type="file" name="banner-image" style="display: none" />
+            <center
+              style="
+                position: absolute;
+                top: 50%;
+                left: 50%;
+    
+                transform: translate(-50%, -50%);
+              "
+              id="upload-info-container"
+            >
+              <i style="font-size: 6rem" class="fa fa-cloud" aria-hidden="true"></i>
+              <br />
+              <br />
+            Varlık Ekle
+            </center>
+          </label>
+          <input
+            type="text"
+            style="
+              position: absolute;
+              right: 300px;
+              top: 275px;
+              border-radius: 15px;
+              width: 400px;
+              border: 1px solid rgb(212, 212, 212);
+              outline: none;
+              padding: 0.5rem;
+              font-size: 1rem;
+            "
+            placeholder="Varlık(NFT) Adı"
+            name="asset_name"
+          />
+        
+        <input
+            type="number"
+            style="
+              position: absolute;
+              right: 300px;
+              top: 325px;
+              border-radius: 15px;
+              width: 400px;
+              border: 1px solid rgb(212, 212, 212);
+              outline: none;
+              padding: 0.5rem;
+              font-size: 1rem;
+            "
+            placeholder="Satış Fiyatı"
+            name="asking_price"
+          />
+          <button class="blue-btn" style="
+          position: absolute;
+          right: 650px;
+          top: 500px;">Kaydet</button>
+      </form>
+    </div>
+    <script>
+        if(window.innerWidth < 1350){
+            alert("Mobil cihazlardan varlık oluşturamazsınız!");
+            window.location = "/profile"
+        }
+        var imgInp = document.getElementById("image-input")
+        var fileUpload = document.getElementsByClassName("file-upload")[0];
+        imgInp.onchange = evt => {
+        const [file] = imgInp.files
+        if (file) {
+          document.getElementById("upload-info-container").style.display = "none"
+          fileUpload.style.backgroundImage = "url('" + URL.createObjectURL(file)+"')"
+        }
+      }
+    </script>
+  <script>
+      if(window.innerHeight > window.innerWidth){
+        document.getElementById("search-bar").style.display = "none"
+        document.getElementById("search-icon").style.display = "block"
+      }
+    </script>
+  </body>
+</html>

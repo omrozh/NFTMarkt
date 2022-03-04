@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ collection.title }} - Koleksiyon | NFTMarkt</title>
+    <script
+      src="https://kit.fontawesome.com/4246ac988c.js"
+      crossorigin="anonymous"
+    ></script>
+    <link rel="stylesheet" href="/file/styles.css" />
+  </head>
+  <body>
+    <div class="navbar">
+      <img onclick="document.location = '/home'" class="logo" src="/file/Markt.png" alt="" />
+      <input
+        type="text"
+        placeholder="Koleksiyonları arayın"
+        class="search-bar"
+        id="search-bar"
+        onclick="document.location = '/search'"
+      />
+      <i
+        class="fas fa-search"
+        style="
+          color: gray;
+          position: absolute;
+          right: 40%;
+          font-size: 1.5rem;
+          top: 22px;
+          display: none;
+        "
+        id="search-icon"
+        onclick="document.location = '/search'"
+      ></i>
+
+      <i
+        class="far fa-user"
+        style="
+          color: gray;
+          position: absolute;
+          right: 5%;
+          font-size: 1.5rem;
+          top: 22px;
+        "
+        onclick="window.open('/profile')"
+      ></i>
+    </div>
+    <div
+      alt=""
+      style="
+        width: 100%;
+        background-image: url('{{ collection.banner_image }}');
+        height: 250px;
+        background-size: cover;
+        background-position: center center;
+      "
+    ></div>
+    <center>
+      <h1 style="font-size: 3rem">{{ collection.title }}</h1>
+      <p>Created by {{ creator }}</p>
+      <br />
+      <button class="empty-button" onclick="window.open('{{ collection.external_link }}')">Siteye Git</button>
+      {% if is_admin %}
+        <button onclick="document.location = '/create-asset/collection={{ collection.id }}'" class="empty-button">&nbsp; Yarat<i style="margin-left: 10px;" class="fa fa-pencil" aria-hidden="true"></i></button>
+      {% endif %}
+      <br />
+      <p>
+        Minimum Fiyat: {{ collection.min_price }} | Maksimum Fiyat: {{
+        collection.max_price }} | Öğe Sayısı: {{ collection.number_of_assets }}
+      </p>
+    </center>
+    <div class="showroom">
+      {% for i in assets %}
+      <div class="showcase-card">
+        <img
+            src="{{ i.asset_path }}"
+            alt=""
+            class="card-image"
+          />
+        <h1>{{ i.asset_name }}</h1>
+        <h3>Fiyat</h3>
+        <p>{{ i.asking_price }}₺</p>
+        <button class="blue-btn" onclick="window.open('/view-asset/asset_id={{ i.id }}')">Satın Al</button>
+      </div>
+      {% endfor %}
+    </div>
+    <br style="clear: both" />
+    <script>
+      if(window.innerWidth < window.innerHeight){
+        var cards = document.getElementsById("")
+      }
+    </script>
+    <script>
+      if(window.innerHeight > window.innerWidth){
+        document.getElementById("search-bar").style.display = "none"
+        document.getElementById("search-icon").style.display = "block"
+      }
+    </script>
+    <br />
+  </body>
+</html>

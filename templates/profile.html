@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profiliniz | NFTMarkt</title>
+    <script
+      src="https://kit.fontawesome.com/4246ac988c.js"
+      crossorigin="anonymous"
+    ></script>
+    <link rel="stylesheet" href="/file/styles.css">
+    <style>
+      .profile-picture{
+        width: 128px;
+        border-radius: 50%;
+        position: absolute;
+        top: 200px;
+        left: 0;
+        right: 0;
+        margin-left: auto;
+        margin-right: auto;
+        border: 4px solid white;
+      }
+      .profile-background{
+        background-color: rgb(216, 212, 212);
+        width: 100%;
+        height: 200px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="navbar">
+      <img onclick="document.location = '/home'" class="logo" src="/file/Markt.png" alt="" />
+      <input
+        type="text"
+        placeholder="Koleksiyonları arayın"
+        class="search-bar"
+        id="search-bar"
+        onclick="document.location = '/search'"
+      />
+      <i
+        class="fas fa-search"
+        style="
+          color: gray;
+          position: absolute;
+          right: 40%;
+          font-size: 1.5rem;
+          top: 22px;
+          display: none;
+        "
+        id="search-icon"
+        onclick="window.open('/search')"
+      ></i>
+      
+      <i
+        class="far fa-user"
+        style="
+          color: gray;
+          position: absolute;
+          right: 5%;
+          font-size: 1.5rem;
+          top: 22px;
+        "
+      ></i>
+      </div>
+      <center>
+        <div class="profile-background"></div>
+        <img class="profile-picture" src="http://127.0.0.1:5000/file/profile.png" alt="">
+        <button onclick="document.location = '/create-collection'" class="blue-btn" style="position: absolute; top: 350px; left: 0; right: 0; margin-right: auto; margin-left: auto; width: 100px">&nbsp; Yarat<i style="margin-left: 10px;" class="fa fa-pencil" aria-hidden="true"></i>
+        </button>
+        <p style="position: absolute; top: 400px; left: 0; right: 0; margin-right: auto; margin-left: auto; width: 400px"><button class="empty-button" onclick="window.open('/payout')">Kazançlar: {{ user.account_balance }}₺ </button></p>
+
+      </center>
+      <center style="margin-top: 200px">
+        <span class="tab-switch" style="float: left; margin-left: 100px; border-bottom: 2px solid rgb(17, 153, 250)" onclick="setTab(document.getElementById('owned-assets'), this)">Sahip Olduklarım</span>
+        <span class="tab-switch" onclick="setTab(document.getElementById('created-assets'), this)">Oluşturulanlar</span>
+        <span onclick="setTab(document.getElementById('collections'), this)" class="tab-switch" style="float: right; margin-right: 100px">Koleksiyonlarım</span>
+        <br style="clear: both">
+        <div id="owned-assets" style="clear: both" class="showroom">
+          {% for i in assets %}
+          <div class="showcase-card">
+          <img
+            src="{{ i.asset_path }}"
+            alt=""
+            class="card-image"
+          />
+          <h1>{{ i.asset_name }}</h1>
+          <h3>Fiyat</h3>
+          <p>{{ i.asking_price }}₺</p>
+          <button class="blue-btn" onclick="window.open('/view-asset/asset_id={{ i.id }}')">Ayarlara Git</button>
+        </div>
+        {% endfor %}
+      </div>
+        <div id="created-assets" class="showroom" style="display: none">
+          {% for i in created_assets %}
+          <div class="showcase-card">
+          <img
+            src="{{ i.asset_path }}"
+            alt=""
+            class="card-image"
+          />
+          <h1>{{ i.asset_name }}</h1>
+          <h3>Fiyat</h3>
+          <p>{{ i.asking_price }}₺</p>
+          <button class="blue-btn" onclick="window.open('/view-asset/asset_id={{ i.id }}')">Ayarlara Git</button>
+        </div>
+        {% endfor %}
+      </div>
+      <div id="collections" class="showroom" style="display: none">
+        {% for i in collections %}
+          <div class="showcase-card">
+          <img
+            src="{{ i.banner_image }}"
+            alt=""
+            class="card-image"
+          />
+          <h1>{{ i.title }}</h1>
+          <p>
+            {{ i.description }}
+          </p>
+          <h3>Minimum Fiyat</h3>
+          <p>{{ i.min_price }}₺</p>
+          <h3>Maksimum Fiyat</h3>
+          <p>{{ i.max_price }}₺</p>
+          <button class="blue-btn" onclick="window.location = '/view-collection/collection={{ i.id }}'">Koleksiyona Git</button>
+        </div>
+      {% endfor %}
+    </div>
+          <br style="clear: both">
+          <br>
+        </div>
+      </center>
+      <script>
+        function setTab(choosen_tab, buttonTrigger){
+          all_tabs = document.getElementsByClassName("showroom");
+          all_switches = document.getElementsByClassName("tab-switch");
+          for(let i = 0; i < all_tabs.length; i++){
+            all_tabs[i].style.display = "none"; 
+            all_switches[i].style.borderBottom = "none"; 
+          }
+          choosen_tab.style.display = "block";
+          buttonTrigger.style.borderBottom = "2px solid rgb(17, 153, 250)"
+        }
+      </script>
+  <script>
+      if(window.innerHeight > window.innerWidth){
+        document.getElementById("search-bar").style.display = "none"
+        document.getElementById("search-icon").style.display = "block"
+      }
+    </script>
+  </body>
+</html>
