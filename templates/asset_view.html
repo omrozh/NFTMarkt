@@ -69,14 +69,15 @@
           margin-left: 15px;
         "
       >
-        <span style="color: gray">Satın Al</span>
+        <span style="color: gray">Satın Al | Koleksiyon Komisyonu: {{ asset.commission_fee }}%</span>
         <br />
+
         <span style="color: rgb(83, 83, 83); font-size: 2rem"
-          >{{ asset.asking_price }}₺</span
-        >
+          >{{ asset.asking_price }}₺</span>
+
         {% if not is_not_for_sale and not is_owner %}
           <button
-            style="float: right; margin-right: 25px; margin-top: -15px"
+            style="float: right; margin-right: 25px; margin-top: -25px"
             class="empty-button"
             onclick="window.open('/checkout/asset_id={{ asset.id }}')"
           >
