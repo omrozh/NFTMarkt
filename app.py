@@ -22,7 +22,7 @@ app = flask.Flask(__name__)
 app.config["SECRET_KEY"] = "MakeMeABillionaire"
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///site.db"
 
-from models import User, Payout, Asset, Collection, db, CardInfo, NFTCreatorApplication
+from models import User, Payout, Asset, Collection, db, CardInfo, NFTCreatorApplication, NFTPriceOffer
 
 login_manager = LoginManager(app)
 bcrypt = Bcrypt(app)
@@ -240,10 +240,16 @@ def view_collection(collection_id):
                                  is_admin=is_admin)
 
 
-@app.route("/view-asset/asset_id=<asset_id>")
+@app.route("/view-asset/asset_id=<asset_id>", methods=["POST", "GET"])
 @login_required
 def view_asset(asset_id):
     asset = Asset.query.get(int(asset_id))
+
+    if flask.request.method == "POST":
+        new_offer = NFTPriceOffer(offered_asset=int(asset_id), offer_maker=current_user.id,
+                                  price=float(flask.request.values["price_recommendation"]))
+        db.session.add(new_offer)
+        db.session.commit()
 
     transactions = asset.transaction_history.split("&&")
     transactions.pop()
@@ -256,8 +262,14 @@ def view_asset(asset_id):
     is_not_for_sale = asset.status == "Not For Sale"
     is_owner = asset.owner == current_user.id
 
+    offers = [{
+        "offer_maker": User.query.get(int(i.offer_maker)).fullname,
+        "price": i.price
+    } for i in NFTPriceOffer.query.filter_by(offered_asset=int(asset_id))]
+    offers.reverse()
+
     return flask.render_template("asset_view.html", dates=dates, prices=prices, asset=asset, similar=similar,
-                                 is_not_for_sale=is_not_for_sale, is_owner=is_owner)
+                                 is_not_for_sale=is_not_for_sale, is_owner=is_owner, offers=offers)
 
 
 @app.route("/checkout/asset_id=<asset_id>", methods=["POST", "GET"])

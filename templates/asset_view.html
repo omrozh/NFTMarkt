@@ -101,6 +101,23 @@
         {% endif %}
       </div>
     </div>
+    <div>
+      <br style="clear: both">
+      <br>
+      <h1 style="margin-left: 5%">Fiyat Önerileri</h1>
+      <form method="post" enctype="multipart/form-data">
+        <input name="price_recommendation" type="number" placeholder="Fiyat Teklifinde Bulun" class="empty-input">
+        <input type="submit" class="empty-button" value="Teklif Et">
+      </form>
+      <br>
+      {% for i in offers %}
+        <div style="border: 1px solid rgb(200, 200, 200); border-radius: 5px; padding: 10px; margin: 15px; height: 20px; margin-left: 5%; margin-right: 5%">
+          <span style="float: left">{{ i.offer_maker }}</span>
+          <span style="float: right">{{ i.price }}₺</span>
+        </div>
+        <br>
+      {% endfor %}
+    </div>
     <br style="clear: both" />
     <br />
     <h1 style="margin-left: 5%">Benzerleri</h1>

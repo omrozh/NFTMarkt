@@ -72,3 +72,9 @@ class NFTCreatorApplication(db.Model):
     website_url = db.Column(db.String)
     twitter_url = db.Column(db.String)
 
+
+class NFTPriceOffer(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    offered_asset = db.Column(db.Integer)
+    offer_maker = db.Column(db.Integer)
+    price = db.Column(db.Float)
