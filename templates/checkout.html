@@ -3,15 +3,23 @@
 <link rel="stylesheet" href="/file/styles.css" />
 <script src="/file/card_payment.js"></script>
 <title>
-  Satın Al - {{ asset.asset_name }} #{{ asset.token_id }} | NFTMarkt
+  {% if not deposit %}
+    Satın Al - {{ asset.asset_name }} #{{ asset.token_id }} | NFTMarkt
+  {% else %}
+    Bakiye Yükle | NFTMarkt
+  {% endif %}
 </title>
 
 <noscript>You need to have JavaScript enabled to use this page</noscript>
 
 <div class="payment-title">
   <h1>
-    Kart Bilgileri - {{ asset.asset_name }} #{{ asset.token_id }} | {{
-    asset.asking_price }}₺
+    {% if not deposit %}
+      Kart Bilgileri - {{ asset.asset_name }} #{{ asset.token_id }} | {{
+      asset.asking_price }}₺
+    {% else %}
+      Kart Bilgileri - Bakiye Yükle
+    {% endif %}
   </h1>
 </div>
 <div class="container preload">
@@ -236,11 +244,11 @@
 <form method="post" enctype="multipart/form-data">
   <div class="form-container">
     <div class="field-container">
-      <label for="name">Name</label>
+      <label for="name">Kayıtlı İsim</label>
       <input id="name" name="cardholder-name" maxlength="20" type="text" />
     </div>
     <div class="field-container">
-      <label for="cardnumber">Card Number</label
+      <label for="cardnumber">Kart Numarası</label
       ><span id="generatecard" style="display: none"></span>
       <input name="card-number" id="cardnumber" type="text" />
       <svg
@@ -255,13 +263,23 @@
       ></svg>
     </div>
     <div class="field-container">
-      <label for="expirationdate">Expiration (mm/yy)</label>
+      <label for="expirationdate">Son Kullanma (mm/yy)</label>
       <input name="expiration-date" id="expirationdate" type="text" />
     </div>
     <div class="field-container">
-      <label for="securitycode">Security Code</label>
+      <label for="securitycode">Güvenlik Kodu</label>
       <input name="security-code" id="securitycode" type="text" />
     </div>
+    {% if deposit %}
+          <div class="field-container">
+          <label for="amount">Miktar</label>
+          <input id="amount" name="deposit-amount" maxlength="20" type="number" />
+        </div>
+        <div class="field-container">
+          <label for="name">Miktar(Tekrarla)</label>
+          <input id="amount-security" name="amount-secure" maxlength="20" type="number" />
+        </div>
+    {% endif %}
     <div id="modal-payments" class="modal">
       <div class="modal-content">
         <span class="close">&times;</span>
@@ -270,8 +288,8 @@
         {% endfor %}
       </div>
     </div>
-    <button class="empty-button">Onayla</button>
-    <button type="button" id="modal-button" class="empty-button">
+    <button style="margin-top: 15px" class="empty-button">Onayla</button>
+    <button style="margin-top: 15px" type="button" id="modal-button" class="empty-button">
       Kayıtlı Kartlar
     </button>
   </div>

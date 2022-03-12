@@ -69,7 +69,7 @@
         <img class="profile-picture" src="http://127.0.0.1:5000/file/profile.png" alt="">
         <button onclick="document.location = '/create-collection'" class="blue-btn" style="position: absolute; top: 350px; left: 0; right: 0; margin-right: auto; margin-left: auto; width: 100px">&nbsp; Yarat<i style="margin-left: 10px;" class="fa fa-pencil" aria-hidden="true"></i>
         </button>
-        <p style="position: absolute; top: 400px; left: 0; right: 0; margin-right: auto; margin-left: auto; width: 400px"><button class="empty-button" onclick="window.open('/payout')">Kazançlar: {{ user.account_balance }}₺ </button></p>
+        <p style="position: absolute; top: 400px; left: 0; right: 0; margin-right: auto; margin-left: auto; width: 400px"><button style="width: 200px" class="empty-button" onclick="window.open('/deposit')">Bakiye: {{ "%.2f" % user.account_balance }}₺ </button><button class="empty-button" onclick="window.open('/withdraw-cash')">Para Çek</button></p>
 
       </center>
       <center style="margin-top: 200px">

@@ -27,6 +27,8 @@ from models import User, Payout, Asset, Collection, db, CardInfo, NFTCreatorAppl
 login_manager = LoginManager(app)
 bcrypt = Bcrypt(app)
 
+exchange_commission = 2
+
 
 def charge_user(charge_data, amount):
     token = stripe.Token.create(
@@ -215,7 +217,10 @@ def create_asset(collection_id):
 @login_required
 def discover():
     collections = Collection.query.all()
-    return flask.render_template("discover.html", collections=collections)
+    notify_user = current_user.notify_user
+    current_user.notify_user = False
+    db.session.commit()
+    return flask.render_template("discover.html", collections=collections, notify_user=notify_user)
 
 
 @app.route("/profile")
@@ -246,8 +251,17 @@ def view_asset(asset_id):
     asset = Asset.query.get(int(asset_id))
 
     if flask.request.method == "POST":
+        if current_user.account_balance < float(flask.request.values["price_recommendation"]) or \
+                float(flask.request.values["price_recommendation"]) < 0:
+            return f'''
+            <script>
+                alert("Hesap bakiyeniz yetersiz")
+                document.location = '/view-asset/asset_id={asset_id}'
+            </script>
+          '''
         new_offer = NFTPriceOffer(offered_asset=int(asset_id), offer_maker=current_user.id,
                                   price=float(flask.request.values["price_recommendation"]))
+        User.query.get(int(asset.owner)).notify_user = True
         db.session.add(new_offer)
         db.session.commit()
 
@@ -264,7 +278,8 @@ def view_asset(asset_id):
 
     offers = [{
         "offer_maker": User.query.get(int(i.offer_maker)).fullname,
-        "price": i.price
+        "price": i.price,
+        "id": i.id
     } for i in NFTPriceOffer.query.filter_by(offered_asset=int(asset_id))]
     offers.reverse()
 
@@ -286,15 +301,15 @@ def checkout(asset_id):
         values = flask.request.values
         if values["card-number"] not in user_card_numbers:
             card_info = CardInfo(card_owner_fk=current_user.id, card_number=values["card-number"],
-                                     cvc=values["security-code"], card_owner_name=values["cardholder-name"],
-                                     valid_thru=values["expiration-date"])
+                                 cvc=values["security-code"], card_owner_name=values["cardholder-name"],
+                                 valid_thru=values["expiration-date"])
 
             db.session.add(card_info)
             db.session.commit()
         else:
             card_info = CardInfo(card_owner_fk=current_user.id, card_number=values["card-number"],
-                                     cvc=values["security-code"], card_owner_name=values["cardholder-name"],
-                                     valid_thru=values["expiration-date"])
+                                 cvc=values["security-code"], card_owner_name=values["cardholder-name"],
+                                 valid_thru=values["expiration-date"])
 
         if charge_user(card_info, asset.asking_price):
             asset.transaction_history += f"{datetime.today()}/{asset.asking_price}&&"
@@ -305,6 +320,10 @@ def checkout(asset_id):
             previous_owner.account_balance += float(asset.asking_price) * float((100 - asset.commission_fee) / 100)
             creator.account_balance += float(asset.asking_price) * float(asset.commission_fee / 100)
 
+            previous_owner.notify_user = True
+
+            previous_owner.account_balance -= float(float(asset.asking_price) * float(exchange_commission / 100))
+
             asset.status = "Not For Sale"
 
             asset.owner = current_user.id
@@ -313,7 +332,7 @@ def checkout(asset_id):
 
             return flask.redirect(f"/view-asset/asset_id={asset_id}")
 
-    return flask.render_template("checkout.html", asset=asset, saved_cards=user_cards)
+    return flask.render_template("checkout.html", asset=asset, saved_cards=user_cards, deposit=False)
 
 
 @app.route("/sell/asset_id=<asset_id>", methods=["POST", "GET"])
@@ -362,12 +381,122 @@ def logout():
 def searchCollections():
     pre_search_collections = Collection.query.all()
     if flask.request.method == "POST":
-        collections = Collection.query.filter\
+        collections = Collection.query.filter \
             (Collection.title.like('%' + flask.request.values["search_term"] + '%')).all()
         return flask.render_template("search.html", collections=collections)
     return flask.render_template("search.html", collections=pre_search_collections)
 
 
+@app.route("/deposit", methods=["POST", "GET"])
+def makeDeposit():
+    user_cards = CardInfo.query.filter_by(card_owner_fk=current_user.id).all()
+    user_card_numbers = [i.card_number for i in user_cards]
+
+    if flask.request.method == "POST":
+        values = flask.request.values
+
+        if values["deposit-amount"] != values["amount-secure"]:
+            return '''
+                <script>
+                    alert('Miktarlar Eşleşmiyor')
+                    window.location = '/'
+                </script>
+            '''
+
+        if values["card-number"] not in user_card_numbers:
+            card_info = CardInfo(card_owner_fk=current_user.id, card_number=values["card-number"],
+                                 cvc=values["security-code"], card_owner_name=values["cardholder-name"],
+                                 valid_thru=values["expiration-date"])
+
+            db.session.add(card_info)
+            db.session.commit()
+
+        else:
+            card_info = CardInfo(card_owner_fk=current_user.id, card_number=values["card-number"],
+                                 cvc=values["security-code"], card_owner_name=values["cardholder-name"],
+                                 valid_thru=values["expiration-date"])
+
+        if charge_user(card_info, float(values["deposit-amount"])):
+            current_user.account_balance += float(values["deposit-amount"])
+            db.session.commit()
+
+        return flask.redirect("/profile")
+
+    return flask.render_template("checkout.html", saved_cards=user_cards, deposit=True)
+
+
+@app.route("/accept_offer/asset_id=<asset_id>/offer_id=<offer_id>")
+@login_required
+def acceptOffer(asset_id, offer_id):
+    asset = Asset.query.get(int(asset_id))
+    offer = NFTPriceOffer.query.get(int(offer_id))
+    offer_maker = User.query.get(int(offer.offer_maker))
+    asset_owner = User.query.get(int(asset.owner))
+    creator = User.query.get(int(asset.creator))
+
+    if asset.owner == current_user.id:
+        if offer_maker.account_balance < offer.price:
+            return flask.abort(500)
+
+        offer_maker.account_balance -= offer.price
+
+        asset_owner.account_balance += float(offer.price) * float((100 - asset.commission_fee) / 100)
+        creator.account_balance += float(asset.asking_price) * float(asset.commission_fee / 100)
+
+        asset_owner.account_balance -= float(offer.price * float(exchange_commission / 100))
+
+        asset.owner = offer_maker.id
+
+        asset.transaction_history += f"{datetime.today()}/{offer.price}&&"
+
+        asset.asking_price = offer.price
+
+        asset.status = "Not For Sale"
+
+        current_collection = Collection.query.get(asset.collection)
+
+        all_assets_in_collection = Asset.query.filter_by(collection=int(current_collection.id)).all()
+
+        max_price_in_collection = 0
+        min_price_in_collection = 1000000000
+
+        for i in all_assets_in_collection:
+            if float(i.asking_price) > float(max_price_in_collection):
+                max_price_in_collection = float(i.asking_price)
+            if float(i.asking_price) < float(min_price_in_collection):
+                min_price_in_collection = float(i.asking_price)
+
+        current_collection.max_price = max_price_in_collection
+        current_collection.min_price = min_price_in_collection
+
+        for i in NFTPriceOffer.query.filter_by(offered_asset=int(asset_id)):
+            db.session.delete(i)
+
+        db.session.commit()
+
+        return flask.redirect(f"/view-asset/asset_id={asset_id}")
+    else:
+        return flask.redirect(f"/view-asset/asset_id={asset_id}")
+
+
 @app.route("/terms")
 def terms():
     return flask.render_template("terms.html")
+
+
+@app.route("/withdraw-cash", methods=["POST", "GET"])
+@login_required
+def withdrawCash():
+    if flask.request.method == "POST":
+        values = flask.request.values
+        if float(values["amount"]) > current_user.account_balance:
+            return flask.render_template("withdraw_cash.html", amount_check=False)
+        else:
+            current_user.account_balance -= float(values["amount"])
+            new_payout = Payout(amount=float(values["amount"]), notes=values["notes"], iban=values["iban"])
+            db.session.add(new_payout)
+            db.session.commit()
+            return flask.redirect("/profile")
+    return flask.render_template("withdraw_cash.html", amount_check=True)
+
+# Add admin panel

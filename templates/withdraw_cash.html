@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Banka Hesabına Ödeme Al | NFTMarkt</title>
+    <link rel="stylesheet" href="/file/styles.css" />
+  </head>
+  <body>
+    {% if amount_check %}
+        <div class="notification-box">
+          <span>
+            Yurtiçi ödemeleriniz iş saatleri içerisinde bu formu yolladıysanız aynı
+              gün içerisinde aksi takdirde ertesi iş günü içerisinde gerçekleştirilecektir.
+          </span>
+        </div>
+    {% elif not amount_check %}
+        <div class="notification-box" style="background-color: #d5385a; background-image: none">
+          <span>
+            Ödeme almak istediğiniz miktar hesap bakiyenizden fazla olamaz.
+          </span>
+        </div>
+    {% endif %}
+    <style>
+      .main-input {
+        border-bottom-left-radius: 6px;
+        border-bottom-right-radius: 6px;
+        border-bottom-style: solid;
+        border-bottom-width: 1px;
+        border-collapse: separate;
+        border-image-outset: 0px;
+        border-image-repeat: stretch;
+        border-image-slice: 100%;
+        border-image-source: none;
+        border-image-width: 1;
+        border-inline-end-color: rgb(212, 212, 212);
+        border-inline-end-style: solid;
+        border-inline-end-width: 1px;
+        border-inline-start-color: rgb(212, 212, 212);
+        border-inline-start-style: solid;
+        border-inline-start-width: 1px;
+        border-left-color: rgb(212, 212, 212);
+        border-left-style: solid;
+        border-left-width: 1px;
+        border-right-color: rgb(212, 212, 212);
+        border-right-style: solid;
+        border-right-width: 1px;
+        border-top-color: rgb(212, 212, 212);
+        border-color: rgb(212, 212, 212);
+        border-top-left-radius: 6px;
+        border-top-right-radius: 6px;
+        border-top-style: solid;
+        border-top-width: 1px;
+        font-size: 1.5rem;
+        outline: none;
+        padding: 1%;
+        resize: none;
+        width: 70%;
+      }
+    </style>
+    <div class="navbar">
+      <img
+        onclick="document.location = '/home'"
+        class="logo"
+        src="/file/Markt.png"
+        alt=""
+      />
+      <input
+        type="text"
+        placeholder="Koleksiyonları arayın"
+        class="search-bar"
+        id="search-bar"
+        onclick="document.location = '/search'"
+      />
+      <i
+        class="fas fa-search"
+        style="
+          color: gray;
+          position: absolute;
+          right: 40%;
+          font-size: 1.5rem;
+          top: 22px;
+          display: none;
+        "
+        id="search-icon"
+        onclick="document.location = '/search'"
+      ></i>
+
+      <i
+        class="far fa-user"
+        style="
+          color: gray;
+          position: absolute;
+          right: 5%;
+          font-size: 1.5rem;
+          top: 22px;
+        "
+        onclick="window.open('/profile')"
+      ></i>
+    </div>
+    <form method="post" enctype="multipart/form-data" style="padding: 5%">
+      <h1>NFTMarkt Banka Hesabına Ödeme Alma Formu</h1>
+      <br />
+      <br />
+      <input
+        type="text"
+        class="main-input"
+        name="iban"
+        placeholder="IBAN"
+      />
+      <br />
+      <br />
+      <input
+        type="number"
+        class="main-input"
+        name="amount"
+        placeholder="Ödeme Miktarı"
+      />
+      <br />
+      <br />
+      <input
+        type="text"
+        class="main-input"
+        name="notes"
+        placeholder="Notlar"
+      />
+      <br />
+      <br />
+      <button class="blue-btn">Formu Gönder</button>
+    </form>
+  </body>
+  <script>
+    if (window.innerHeight > window.innerWidth) {
+      document.getElementById("search-bar").style.display = "none";
+      document.getElementById("search-icon").style.display = "block";
+    }
+  </script>
+</html>

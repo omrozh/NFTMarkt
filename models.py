@@ -13,6 +13,7 @@ class User(db.Model, UserMixin):
     account_balance = db.Column(db.Integer, default=0)
     favorites = db.Column(db.String)
     creation_permit = db.Column(db.Boolean, default=False)
+    notify_user = db.Column(db.Boolean, default=False)
 
 
 class Collection(db.Model):
@@ -51,7 +52,7 @@ class Payout(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     iban = db.Column(db.String)
     swift = db.Column(db.String)
-    fullname = db.Column(db.String)
+    notes = db.Column(db.String)
     amount = db.Column(db.Float)
 
 
