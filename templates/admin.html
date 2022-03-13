@@ -2,9 +2,33 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Admin</title>
 </head>
 <body>
-
+    {% for user in users %}
+        <form id="{{ user.id }}" method="post" enctype="multipart/form-data">
+            <p>{{ user.fullname }} | {{ user.email }} | {{ user.creation_permit }} | ID: {{ user.id }}</p>
+            <input style="display: none" name="p-u-id" value="{{ user.id }}"/>
+            <select name="action" onchange="document.getElementById('{{ user.id }}').submit()">
+                <option value="grant_creation_permit">Select One</option>
+                <option value="grant_creation_permit">Grant Creation Permit</option>
+                <option value="cancel_creation_permit">Cancel Creation Permit</option>
+            </select>
+        </form>
+    {% endfor %}
+    {% for payout in payouts %}
+        <form id="p-{{ payout.id }}" method="post" enctype="multipart/form-data">
+            <p>{{ payout.notes }} | {{ payout.iban }} | {{ payout.amount }}</p>
+            <input style="display: none" name="p-u-id" value="{{ payout.id }}"/>
+            <button name="action" value="payout" onclick="document.getElementById('p-{{ payout.id }}').submit()">Onayla</button>
+        </form>
+    {% endfor %}
+    {% for i in applications %}
+        <p>{{ i.associated_user }}</p>
+        <p>{{ i.twitter_url }}</p>
+        <p>{{ i.website_url }}</p>
+        <p>{{ i.discord_url }}</p>
+        <p>{{ i.project_description }}</p>
+    {% endfor %}
 </body>
 </html>

@@ -521,9 +521,16 @@ def admin():
         if action == "payout":
             db.session.delete(Payout.query.get(int(payout_or_user_id)))
             db.session.commit()
-        elif action == "creation_permit":
-            User.query.get(int(payout_or_user_id))
-        return flask.redirect("/admin", payouts=payouts, users=users)
+        elif action == "grant_creation_permit":
+            subject_user = User.query.get(int(payout_or_user_id))
+            subject_user.creation_permit = True
+            db.session.commit()
+        elif action == "cancel_creation_permit":
+            subject_user = User.query.get(int(payout_or_user_id))
+            subject_user.creation_permit = False
+            db.session.commit()
+        return flask.redirect("/admin")
 
-    return flask.render_template("admin.html")
+    return flask.render_template("admin.html", payouts=payouts, users=users,
+                                 applications=NFTCreatorApplication.query.all())
 
