@@ -8,7 +8,7 @@ body {
 .head-main {
   background: linear-gradient(#c3f43c, #98ccdc);
   width: 100%;
-  height: 100vh;
+  min-height: 100vh;
   position: relative;
 }
 .navbar {

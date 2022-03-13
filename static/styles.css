@@ -53,6 +53,7 @@ html {
   margin-top: 5%;
   padding-bottom: 15px;
 }
+
 .card-image {
   border-radius: 15px;
   width: 100%;
@@ -129,9 +130,8 @@ html {
     margin: 15px;
     height: 20px;
     margin-left: 5%;
-    margin-right: 5%;
     outline: none;
-    min-width: 300px
+    width: 300px;
 }
 
 .modal {

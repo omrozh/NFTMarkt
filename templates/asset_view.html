@@ -69,7 +69,7 @@
           margin-left: 15px;
         "
       >
-        <span style="color: gray">Satın Al | Koleksiyon Komisyonu: {{ asset.commission_fee }}%</span>
+        <span style="color: gray">Satın Al</span>
         <br />
 
         <span style="color: rgb(83, 83, 83); font-size: 2rem"
@@ -104,12 +104,11 @@
     <div>
       <br style="clear: both">
       <br>
-
       <h1 style="margin-left: 5%">Fiyat Önerileri</h1>
       {% if not is_owner %}
         <form method="post" enctype="multipart/form-data">
           <input name="price_recommendation" type="number" placeholder="Fiyat Teklifinde Bulun" class="empty-input">
-          <input type="submit" class="empty-button" value="Teklif Et">
+          <input type="submit" class="empty-button" style="margin-left: 5%" value="Teklif Et">
         </form>
       {% endif %}
       <br>
@@ -178,9 +177,23 @@
     const myChart = new Chart(document.getElementById("price-chart"), config);
   </script>
   <script>
-    if (window.innerHeight > window.innerWidth) {
-      document.getElementById("search-bar").style.display = "none";
-      document.getElementById("search-icon").style.display = "block";
-    }
+    if(window.innerHeight > window.innerWidth){
+        document.getElementById("search-bar").style.display = "none"
+        document.getElementById("search-icon").style.display = "block"
+
+        let cards = document.getElementsByClassName("showcase-card")
+        for(var i = 0; i < cards.length; i++){
+          cards[i].style.marginLeft = "auto"
+          cards[i].style.marginRight = "auto"
+
+          cards[i].style.float = "none"
+        }
+
+        let mobileUnfits = document.getElementsByName("mobile-unfit")
+        for(var i = 0; i < mobileUnfits.length; i++){
+          mobileUnfits[i].style.display = "none"
+        }
+        document.getElementById("deposit").style.top = "350px"
+      }
   </script>
 </html>

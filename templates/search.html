@@ -56,6 +56,16 @@
         window.onload = function(){
           document.getElementById('search-bar').focus();
         }
+        if(window.innerHeight > window.innerWidth){
+
+        let cards = document.getElementsByClassName("showcase-card")
+        for(var i = 0; i < cards.length; i++){
+          cards[i].style.marginLeft = "auto"
+          cards[i].style.marginRight = "auto"
+
+          cards[i].style.float = "none"
+        }
+      }
     </script>
   </body>
 </html>

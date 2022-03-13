@@ -15,11 +15,16 @@
     <div class="head-main">
       <div class="title-box">
         <h1 class="title">Lira ile NFT alıp satmaya başlayın.</h1>
-        <p style="font-size: 1.5rem">
+        <p style="font-size: 1.5rem" id="description">
           Web 3.0'ın fırsatlar ile dolu dünyasına uğraşsız adım atın. Cüzdan
           bağlantıları ve kripto para borsalarıyla uğraşmadan kredi kartınız ile
           NFT alıp satın.
         </p>
+        <script>
+          if(window.innerHeight > window.innerWidth){
+            document.getElementById("description").style.display = "none"
+          }
+        </script>
       </div>
       <div
         class="mosaic-loader"

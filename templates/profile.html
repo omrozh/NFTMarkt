@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html style="overflow-x: hidden; width: 100%;" lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -29,7 +29,7 @@
       }
     </style>
   </head>
-  <body>
+  <body style="overflow-x: hidden; width: 100%">
     <div class="navbar">
       <img onclick="document.location = '/home'" class="logo" src="/file/Markt.png" alt="" />
       <input
@@ -52,30 +52,24 @@
         id="search-icon"
         onclick="window.open('/search')"
       ></i>
-      
-      <i
-        class="far fa-user"
-        style="
-          color: gray;
-          position: absolute;
-          right: 5%;
-          font-size: 1.5rem;
-          top: 22px;
-        "
-      ></i>
+
+
+      <button onclick="document.location = '/logout'" class="blue-btn" style="width: 50px; position: absolute; right: 5%;
+       top: 15px"><i style="margin-left: 10px;" class="fa fa-sign-out" aria-hidden="true"></i>
+        </button>
       </div>
       <center>
         <div class="profile-background"></div>
-        <img class="profile-picture" src="http://127.0.0.1:5000/file/profile.png" alt="">
-        <button onclick="document.location = '/create-collection'" class="blue-btn" style="position: absolute; top: 350px; left: 0; right: 0; margin-right: auto; margin-left: auto; width: 100px">&nbsp; Yarat<i style="margin-left: 10px;" class="fa fa-pencil" aria-hidden="true"></i>
+        <img class="profile-picture" src="/file/profile.png" alt="">
+        <button onclick="document.location = '/create-collection'" class="blue-btn" name="mobile-unfit" style="position: absolute; top: 350px; left: 0; right: 0; margin-right: auto; margin-left: auto; width: 100px">&nbsp; Yarat<i style="margin-left: 10px;" class="fa fa-pencil" aria-hidden="true"></i>
         </button>
-        <p style="position: absolute; top: 400px; left: 0; right: 0; margin-right: auto; margin-left: auto; width: 400px"><button style="width: 200px" class="empty-button" onclick="window.open('/deposit')">Bakiye: {{ "%.2f" % user.account_balance }}₺ </button><button class="empty-button" onclick="window.open('/withdraw-cash')">Para Çek</button></p>
+        <p id="deposit" style="position: absolute; top: 400px; left: 0; right: 0; margin-right: auto; margin-left: auto; width: 400px; max-width: 100%"><button style="width: 250px" class="empty-button" onclick="window.open('/deposit')">Bakiye - (Arttır): {{ "%.2f" % user.account_balance }}₺ </button><button class="empty-button" name="mobile-unfit" onclick="window.open('/withdraw-cash')">Para Çek</button></p>
 
       </center>
-      <center style="margin-top: 200px">
-        <span class="tab-switch" style="float: left; margin-left: 100px; border-bottom: 2px solid rgb(17, 153, 250)" onclick="setTab(document.getElementById('owned-assets'), this)">Sahip Olduklarım</span>
+      <center style="margin-top: 200px;">
+        <span class="tab-switch" style="float: left; margin-left: 5%; border-bottom: 2px solid rgb(17, 153, 250)" onclick="setTab(document.getElementById('owned-assets'), this)">Sahip Olduklarım</span>
         <span class="tab-switch" onclick="setTab(document.getElementById('created-assets'), this)">Oluşturulanlar</span>
-        <span onclick="setTab(document.getElementById('collections'), this)" class="tab-switch" style="float: right; margin-right: 100px">Koleksiyonlarım</span>
+        <span onclick="setTab(document.getElementById('collections'), this)" class="tab-switch" style="float: right; margin-right: 5%">Koleksiyonlarım</span>
         <br style="clear: both">
         <div id="owned-assets" style="clear: both" class="showroom">
           {% for i in assets %}
@@ -147,6 +141,20 @@
       if(window.innerHeight > window.innerWidth){
         document.getElementById("search-bar").style.display = "none"
         document.getElementById("search-icon").style.display = "block"
+
+        let cards = document.getElementsByClassName("showcase-card")
+        for(var i = 0; i < cards.length; i++){
+          cards[i].style.marginLeft = "auto"
+          cards[i].style.marginRight = "auto"
+
+          cards[i].style.float = "none"
+        }
+
+        let mobileUnfits = document.getElementsByName("mobile-unfit")
+        for(var i = 0; i < mobileUnfits.length; i++){
+          mobileUnfits[i].style.display = "none"
+        }
+        document.getElementById("deposit").style.top = "350px"
       }
     </script>
   </body>

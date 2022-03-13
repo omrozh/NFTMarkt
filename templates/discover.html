@@ -83,6 +83,19 @@
       if(window.innerHeight > window.innerWidth){
         document.getElementById("search-bar").style.display = "none"
         document.getElementById("search-icon").style.display = "block"
+
+        let cards = document.getElementsByClassName("showcase-card")
+        for(var i = 0; i < cards.length; i++){
+          cards[i].style.marginLeft = "auto"
+          cards[i].style.marginRight = "auto"
+
+          cards[i].style.float = "none"
+        }
+
+        let mobileUnfits = document.getElementsByName("mobile-unfit")
+        for(var i = 0; i < mobileUnfits.length; i++){
+          mobileUnfits[i].style.display = "none"
+        }
       }
     </script>
   </body>
