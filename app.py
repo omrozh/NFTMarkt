@@ -22,6 +22,8 @@ app = flask.Flask(__name__)
 app.config["SECRET_KEY"] = "MakeMeABillionaire"
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///site.db"
 
+authorized_users = ["omrozh@gmail.com"]
+
 from models import User, Payout, Asset, Collection, db, CardInfo, NFTCreatorApplication, NFTPriceOffer
 
 login_manager = LoginManager(app)
@@ -499,4 +501,29 @@ def withdrawCash():
             return flask.redirect("/profile")
     return flask.render_template("withdraw_cash.html", amount_check=True)
 
-# Add admin panel
+
+@app.route("/admin", methods=["POST", "GET"])
+@login_required
+def admin():
+    if current_user.email not in authorized_users:
+        return flask.abort(400)
+
+    payouts = Payout.query.all()
+    users = User.query.all()
+
+    # Issue collection permit
+    # Remove payouts as completed
+
+    if flask.request.method == "POST":
+        action = flask.request.values["action"]
+        payout_or_user_id = flask.request.values["p-u-id"]
+
+        if action == "payout":
+            db.session.delete(Payout.query.get(int(payout_or_user_id)))
+            db.session.commit()
+        elif action == "creation_permit":
+            User.query.get(int(payout_or_user_id))
+        return flask.redirect("/admin", payouts=payouts, users=users)
+
+    return flask.render_template("admin.html")
+
