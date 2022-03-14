@@ -23,6 +23,7 @@ app.config["SECRET_KEY"] = "MakeMeABillionaire"
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///site.db"
 
 authorized_users = ["omrozh@gmail.com"]
+authorized_api_user_keys = ["ug3n38fsg3Agw05DGD53Faed2"]
 
 from models import User, Payout, Asset, Collection, db, CardInfo, NFTCreatorApplication, NFTPriceOffer
 
@@ -534,3 +535,322 @@ def admin():
     return flask.render_template("admin.html", payouts=payouts, users=users,
                                  applications=NFTCreatorApplication.query.all())
 
+
+@app.route("/api/get_collections/key=<key>")
+def api_get_collections(key):
+    if key not in authorized_api_user_keys:
+        return flask.abort(400)
+
+    data = [
+        {
+            "id": i.id,
+            "creator": i.creator,
+            "title": i.title,
+            "number_of_assets": i.number_of_assets,
+            "description": i.description,
+            "logo_path": i.logo_path,
+            "banner_image": i.banner_image,
+            "creator_percentage": i.creator_percentage,
+            "max_price": i.max_price,
+            "min_price": i.min_price,
+            "external_link": i.external_link
+        } for i in Collection.query.all()
+    ]
+
+    return flask.jsonify(data)
+
+
+@app.route("/api/get_assets/collection=<collection_id>/key=<key>")
+def api_get_assets(key, collection_id):
+    if key not in authorized_api_user_keys:
+        return flask.abort(400)
+
+    data = [
+        {
+            "owner": i.owner,
+            "creator": i.creator,
+            "asset_name": i.asset_name,
+            "status": i.status,
+            "asking_price": i.asking_price,
+            "collection": i.collection,
+            "transaction_history": i.transaction_history,
+            "asset_path": i.asset_path,
+            "blockchain": i.blockchain,
+            "contract_address": i.contract_address,
+            "wallet_address": i.wallet_address,
+            "wallet_private": i.wallet_private,
+            "token_id": i.token_id,
+            "commission_fee": i.commission_fee
+        } for i in Asset.query.filter_by(collection=int(collection_id)).all()
+    ]
+
+    return flask.jsonify(data)
+
+
+@app.route("/api/get_single_asset/asset=<asset_id>/key=<key>")
+def api_get_asset(key, asset_id):
+    if key not in authorized_api_user_keys:
+        return flask.abort(400)
+
+    data = [
+        {
+            "owner": i.owner,
+            "creator": i.creator,
+            "asset_name": i.asset_name,
+            "status": i.status,
+            "asking_price": i.asking_price,
+            "collection": i.collection,
+            "transaction_history": i.transaction_history,
+            "asset_path": i.asset_path,
+            "blockchain": i.blockchain,
+            "contract_address": i.contract_address,
+            "wallet_address": i.wallet_address,
+            "wallet_private": i.wallet_private,
+            "token_id": i.token_id,
+            "commission_fee": i.commission_fee
+        } for i in Asset.query.get(id=int(asset_id))
+    ]
+
+    return flask.jsonify(data)
+
+
+@app.route("/api/confirm_login/key=<key>", methods=["POST", "GET"])
+def api_confirm_login(key):
+    if key not in authorized_api_user_keys:
+        return flask.abort(400)
+
+    if flask.request.method == "POST":
+        values = flask.request.values
+        user = User.query.filter_by(email=values["email"]).first()
+        if bcrypt.check_password_hash(user.password, values["password"]):
+            return flask.jsonify({
+                "Status": "Login Confirmed",
+                "Login": True,
+                "Email": values["email"],
+                "User Id": user.id
+            })
+
+    return flask.jsonify({
+        "Status": "Login Refused",
+        "Login": False,
+        "Email": "Unauthorized",
+        "User Id": "Unauthorized"
+    })
+
+
+@app.route("/api/sell_on_behalf/key=<key>", methods=["POST", "GET"])
+def api_sell_on_behalf(key):
+    if key not in authorized_api_user_keys:
+        return flask.abort(400)
+
+    if flask.request.method == "POST":
+        values = flask.request.values
+        asset = Asset.query.get(int(values["asset_id"]))
+
+        asset.status = "For Sale"
+        asset.asking_price = flask.request.values["asking_price"]
+
+        current_collection = Collection.query.get(asset.collection)
+
+        all_assets_in_collection = Asset.query.filter_by(collection=int(current_collection.id)).all()
+
+        max_price_in_collection = 0
+        min_price_in_collection = 1000000000
+
+        for i in all_assets_in_collection:
+            if float(i.asking_price) > float(max_price_in_collection):
+                max_price_in_collection = float(i.asking_price)
+            if float(i.asking_price) < float(min_price_in_collection):
+                min_price_in_collection = float(i.asking_price)
+
+        current_collection.max_price = max_price_in_collection
+        current_collection.min_price = min_price_in_collection
+
+        db.session.commit()
+
+        return flask.jsonify({
+            "Status": "Confirmed Sale",
+            "Asset Name": asset.asset_name,
+            "Asset Id": asset.id,
+            "Owner Id": asset.owner
+        })
+
+    return flask.jsonify({
+        "Status": "Failed Sale",
+        "Asset Name": "Fail",
+        "Asset Id": "Fail",
+        "Owner Id": "Fail"
+    })
+
+
+@app.route("/api/make_offer_on_behalf/key=<key>", methods=["POST", "GET"])
+def api_make_offer_on_behalf(key):
+    if key not in authorized_api_user_keys:
+        return flask.abort(400)
+
+    if flask.request.method == "POST":
+        values = flask.request.values
+        user = User.query.get(int(values["user_id"]))
+        asset = Asset.query.get(int(values["asset_id"]))
+
+        asset_id = values["asset_id"]
+
+        new_offer = NFTPriceOffer(offered_asset=int(asset_id), offer_maker=user.id,
+                                  price=float(flask.request.values["price_recommendation"]))
+        User.query.get(int(asset.owner)).notify_user = True
+        db.session.add(new_offer)
+        db.session.commit()
+
+        return "Confirmed Sell"
+
+    return "Failed Sell"
+
+
+@app.route("/api/profile/user_id=<user_id>/key=<key>")
+def api_get_profile(key, user_id):
+    if key not in authorized_api_user_keys:
+        return flask.abort(400)
+
+    created_collections = data = [
+        {
+            "id": i.id,
+            "creator": i.creator,
+            "title": i.title,
+            "number_of_assets": i.number_of_assets,
+            "description": i.description,
+            "logo_path": i.logo_path,
+            "banner_image": i.banner_image,
+            "creator_percentage": i.creator_percentage,
+            "max_price": i.max_price,
+            "min_price": i.min_price,
+            "external_link": i.external_link
+        } for i in Collection.query.filter_by(creator=int(user_id)).all()
+    ]
+
+    created_assets = [
+        {
+            "owner": i.owner,
+            "creator": i.creator,
+            "asset_name": i.asset_name,
+            "status": i.status,
+            "asking_price": i.asking_price,
+            "collection": i.collection,
+            "transaction_history": i.transaction_history,
+            "asset_path": i.asset_path,
+            "blockchain": i.blockchain,
+            "contract_address": i.contract_address,
+            "wallet_address": i.wallet_address,
+            "wallet_private": i.wallet_private,
+            "token_id": i.token_id,
+            "commission_fee": i.commission_fee
+        } for i in Asset.query.filter_by(creator=int(user_id)).all()
+    ]
+
+    owned_assets = [
+        {
+            "owner": i.owner,
+            "creator": i.creator,
+            "asset_name": i.asset_name,
+            "status": i.status,
+            "asking_price": i.asking_price,
+            "collection": i.collection,
+            "transaction_history": i.transaction_history,
+            "asset_path": i.asset_path,
+            "blockchain": i.blockchain,
+            "contract_address": i.contract_address,
+            "wallet_address": i.wallet_address,
+            "wallet_private": i.wallet_private,
+            "token_id": i.token_id,
+            "commission_fee": i.commission_fee
+        } for i in Asset.query.filter_by(owner=int(user_id)).all()
+    ]
+
+    return flask.jsonify(
+        {
+            "owned_assets": owned_assets,
+            "created_assets": created_assets,
+            "created_collections": created_collections
+        }
+    )
+
+
+@app.route("/api/deposit_on_behalf/key=<key>", methods=["POST", "GET"])
+def deposit_on_behalf(key):
+    if key not in authorized_api_user_keys:
+        return flask.abort(400)
+
+    if flask.request.method == "POST":
+        user_cards = CardInfo.query.filter_by(card_owner_fk=current_user.id).all()
+        user_card_numbers = [i.card_number for i in user_cards]
+
+        values = flask.request.values
+        if values["card-number"] not in user_card_numbers:
+            card_info = CardInfo(card_owner_fk=current_user.id, card_number=values["card-number"],
+                                 cvc=values["security-code"], card_owner_name=values["cardholder-name"],
+                                 valid_thru=values["expiration-date"])
+
+            db.session.add(card_info)
+            db.session.commit()
+
+        else:
+            card_info = CardInfo(card_owner_fk=current_user.id, card_number=values["card-number"],
+                                 cvc=values["security-code"], card_owner_name=values["cardholder-name"],
+                                 valid_thru=values["expiration-date"])
+
+        if charge_user(card_info, float(values["deposit-amount"])):
+            current_user.account_balance += float(values["deposit-amount"])
+            db.session.commit()
+
+        return f"Confirmed deposit of: {values['deposit_amount']}"
+
+    return "Failed deposit"
+
+
+@app.route("/api/buy_on_behalf/asset_id=<asset_id>/key=<key>", methods=["POST", "GET"])
+def sell_on_behalf(asset_id, key):
+    if key not in authorized_api_user_keys:
+        return flask.abort(400)
+
+    asset = Asset.query.get(asset_id)
+    if asset.status == "Not For Sale":
+        return "Asset not for sale"
+
+    user_cards = CardInfo.query.filter_by(card_owner_fk=current_user.id).all()
+    user_card_numbers = [i.card_number for i in user_cards]
+
+    if flask.request.method == "POST":
+        values = flask.request.values
+        if values["card-number"] not in user_card_numbers:
+            card_info = CardInfo(card_owner_fk=current_user.id, card_number=values["card-number"],
+                                 cvc=values["security-code"], card_owner_name=values["cardholder-name"],
+                                 valid_thru=values["expiration-date"])
+
+            db.session.add(card_info)
+            db.session.commit()
+        else:
+            card_info = CardInfo(card_owner_fk=current_user.id, card_number=values["card-number"],
+                                 cvc=values["security-code"], card_owner_name=values["cardholder-name"],
+                                 valid_thru=values["expiration-date"])
+
+        if charge_user(card_info, asset.asking_price):
+            asset.transaction_history += f"{datetime.today()}/{asset.asking_price}&&"
+
+            previous_owner = User.query.get(asset.owner)
+            creator = User.query.get(asset.creator)
+
+            previous_owner.account_balance += float(asset.asking_price) * float((100 - asset.commission_fee) / 100)
+            creator.account_balance += float(asset.asking_price) * float(asset.commission_fee / 100)
+
+            previous_owner.notify_user = True
+
+            previous_owner.account_balance -= float(float(asset.asking_price) * float(exchange_commission / 100))
+
+            asset.status = "Not For Sale"
+
+            asset.owner = current_user.id
+
+            db.session.commit()
+
+        return "Confirmed Sell"
+
+    return "Failed Sell"
